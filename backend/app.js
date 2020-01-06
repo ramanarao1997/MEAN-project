@@ -13,7 +13,7 @@ mongoose.connect('mongodb+srv://Ramana:QB6ufwNpV7RVOoLv@mean-project-cied5.mongo
     console.log('Connected to Database');
   })
   .catch( () =>{
-    console.log('connection failed!');
+    console.log('connection to database failed!');
   });
 
 //to parse the body of request
@@ -60,7 +60,8 @@ app.get('/api/posts', (req, res, next) => {
 
 app.delete('/api/posts/:id', (req, res, next) => {
 
-    Post.deleteOne( {_id:req.params.id} ) //delete from database
+	//delete from database
+    Post.deleteOne( {_id:req.params.id} ) 
       .then(result =>{
         res.status(200).json({message: 'Post deleted!'});
       })
