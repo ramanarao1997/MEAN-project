@@ -8,4 +8,4 @@ const postSchema = mongoose.Schema({
 
 
 // schema to model
-module.exports = mongoose.model('Post',postSchema);
+module.exports = mongoose.model('Post', postSchema);

@@ -26,8 +26,8 @@ app.use( (req, res, next) =>{
   // allow domains with only certain headers in their requests besides the default headers
   res.setHeader('Access-Control-Allow-Headers', 'Origin, Accept, Content-Type, X-Requested-With');
 
-  // allow only specific HTML methods
-   res.setHeader('Access-Control-Allow-Methods','GET, POST, OPTIONS, DELETE, PATCH');
+  // allow only specific HTTP methods
+   res.setHeader('Access-Control-Allow-Methods','GET, POST, OPTIONS, DELETE, PATCH, PUT');
 
   next();
 });
@@ -46,6 +46,20 @@ app.post('/api/posts', (req,res,next) => {
   }); // to save in database
 });
 
+app.put('/api/posts/:id', (req,res,next) =>{
+  const post = new Post({
+    _id: req.body.id,
+    title: req.body.title,
+    content: req.body.content
+  });
+
+  Post.updateOne({_id: req.params.id})
+    .then(result => {
+      console.log('agdgd');
+      res.status(200).json({message:"update successful"});
+    });
+});
+
 app.get('/api/posts', (req, res, next) => {
 
   // get posts from database
@@ -61,8 +75,8 @@ app.get('/api/posts', (req, res, next) => {
 app.delete('/api/posts/:id', (req, res, next) => {
 
 	//delete from database
-    Post.deleteOne( {_id:req.params.id} ) 
-      .then(result =>{
+    Post.deleteOne( {_id:req.params.id} )
+      .then((result )=>{
         res.status(200).json({message: 'Post deleted!'});
       })
 });
