@@ -3,10 +3,9 @@ const bodyParser = require('body-parser');
 
 // for mongoose model
 const mongoose = require('mongoose')
-const Post = require('./models/post');
 
 const app = express();
-
+const postsRoutes = require('./routes/posts');
 
 mongoose.connect('mongodb+srv://Ramana:QB6ufwNpV7RVOoLv@mean-project-cied5.mongodb.net/node-angular?retryWrites=true&w=majority')
   .then(() => {
@@ -32,53 +31,6 @@ app.use( (req, res, next) =>{
   next();
 });
 
-app.post('/api/posts', (req,res,next) => {
-  const post = new Post({
-    title: req.body.title,
-    content: req.body.content
-  });
-
-  post.save().then(createdPost =>{
-    res.status(201).json({
-      message : 'post stored succesfully',
-      postId: createdPost._id
-    });
-  }); // to save in database
-});
-
-app.put('/api/posts/:id', (req,res,next) =>{
-  const post = new Post({
-    _id: req.body.id,
-    title: req.body.title,
-    content: req.body.content
-  });
-
-  Post.updateOne({_id: req.params.id}, post)
-    .then(result => {
-      console.log(result);
-      res.status(200).json({message:"update successful"});
-    });
-});
-
-app.get('/api/posts', (req, res, next) => {
-
-  // get posts from database
-  Post.find()
-    .then(documents => {
-      res.status(200).json({
-        message:'posts retrieved successfully',
-        posts: documents
-      });
-    });
-});
-
-app.delete('/api/posts/:id', (req, res, next) => {
-
-	//delete from database
-    Post.deleteOne( {_id:req.params.id} )
-      .then((result )=>{
-        res.status(200).json({message: 'Post deleted!'});
-      })
-});
+app.use('/api/posts', postsRoutes);
 
 module.exports = app;
