@@ -1,11 +1,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const path = require("path");
 
 // for mongoose model
 const mongoose = require('mongoose')
 
-const app = express();
 const postsRoutes = require('./routes/posts');
+const app = express();
 
 mongoose.connect('mongodb+srv://Ramana:QB6ufwNpV7RVOoLv@mean-project-cied5.mongodb.net/node-angular?retryWrites=true&w=majority')
   .then(() => {
@@ -15,8 +16,12 @@ mongoose.connect('mongodb+srv://Ramana:QB6ufwNpV7RVOoLv@mean-project-cied5.mongo
     console.log('connection to database failed!');
   });
 
-//to parse the body of request
+// To parse the body of request
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended:false}));
+
+// To allow access to images
+app.use("/images",express.static(path.join("backend/images")));
 
 // To avoid CORS problem
 app.use( (req, res, next) =>{
@@ -31,6 +36,6 @@ app.use( (req, res, next) =>{
   next();
 });
 
-app.use('/api/posts', postsRoutes);
+app.use("/api/posts", postsRoutes);
 
 module.exports = app;

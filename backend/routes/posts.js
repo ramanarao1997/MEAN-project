@@ -20,13 +20,13 @@ const storage = multer.diskStorage({
     callback(error,"backend/images");
   },
   filename: (req,file,callback) => {
-    const name = file.originalname.toLowerCase().split(' ').join('-');
+    const name = file.originalname.toLowerCase().split(" ").join("-");
     const ext = MIME_TYPE_MAP[file.mimetype];
-    callback(null, name + '-' + Date.now() +'.' + ext);
+    callback(null, name + '-' + Date.now() + "." + ext);
   }
 })
 
-router.post('', multer({storage: storage}).single("image"), (req,res,next) => {
+router.post("", multer({storage: storage}).single("image"), (req,res,next) => {
   const url = req.protocol + "://" + req.get("host");
 
   const post = new Post({
@@ -35,10 +35,10 @@ router.post('', multer({storage: storage}).single("image"), (req,res,next) => {
     imagePath: url + "/images/" + req.file.filename
   });
 
-  post.save().then(createdPost =>{
+  post.save().then(createdPost => {
     res.status(201).json({
       message : 'post stored succesfully',
-      postId: {
+      post: {
         ...createdPost,
         id: createdPost._id
       }
@@ -46,21 +46,29 @@ router.post('', multer({storage: storage}).single("image"), (req,res,next) => {
   });
 }); // To save a new post in database
 
-router.put('/:id', (req,res,next) =>{
+router.put("/:id",  multer({storage: storage}).single("image"), (req,res,next) =>{
+
+  let imagePath = req.body.imagePath;
+
+  if(req.file){
+    const url = req.protocol + "://" + req.get("host");
+    imagePath = url + "/images/" + req.file.filename
+  }
+
   const post = new Post({
     _id: req.body.id,
     title: req.body.title,
-    content: req.body.content
+    content: req.body.content,
+    imagePath: imagePath
   });
 
   Post.updateOne({_id: req.params.id}, post)
     .then(result => {
-      console.log(result);
       res.status(200).json({message:"update successful"});
     });
 }); // Update a post
 
-router.get('', (req, res, next) => {
+router.get("", (req, res, next) => {
   Post.find()
     .then(documents => {
       res.status(200).json({
@@ -70,7 +78,8 @@ router.get('', (req, res, next) => {
     });
 });// Get posts from database
 
-router.get('/:id', (req,res,next) => {
+
+router.get("/:id", (req,res,next) => {
   Post.findById(req.params.id).then(post => {
     if(post){
       res.status(200).json(post);
@@ -79,11 +88,11 @@ router.get('/:id', (req,res,next) => {
       res.status(404).json({message: 'Post not found!'});
     }
   })
-});
+}); // get single post (to edit)
 
-router.delete('/:id', (req, res, next) => {
+router.delete("/:id", (req, res, next) => {
     Post.deleteOne( {_id:req.params.id} )
-      .then((result )=>{
+      .then(result =>{
         res.status(200).json({message: 'Post deleted!'});
       })
 }); //Delete a post from database

@@ -1,4 +1,5 @@
 import { Post } from './post.model';
+
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
@@ -39,12 +40,12 @@ export class PostsService {
     return this.postsUpdated.asObservable();
   }
 
-  // to edit
   getPost(id: string) {
-    return this.http.get<{ _id: string; title: string; content: string }>(
+    return this.http.get<{ _id: string; title: string; content: string, imagePath: string}>(
       'http://localhost:3000/api/posts/' + id
     );
   }
+  // to edit a post
 
   addPost(title: string, content: string, image: File) {
     const postData = new FormData();
@@ -66,13 +67,33 @@ export class PostsService {
       });
   }
 
-  updatePost(postId: string, title: string, content: string) {
-    const post: Post = { id: postId, title, content, imagePath : null };
+  updatePost(postId: string, title: string, content: string, image: File | string) {
+
+    let postData: Post | FormData;
+
+    if (typeof image === 'object') {
+      postData = new FormData();
+      postData.append('id', postId);
+      postData.append('title', title);
+      postData.append('content', content);
+      postData.append('image', image, title);
+    } else{
+      postData = { id: postId, title:title, content:content, imagePath : image };
+    }
+
     this.http
-      .put('http://localhost:3000/api/posts/' + postId, post)
+      .put('http://localhost:3000/api/posts/' + postId, postData)
       .subscribe(response => {
         const updatedPosts = [...this.posts];
-        const oldPostIndex = updatedPosts.findIndex(p => p.id === post.id);
+        const oldPostIndex = updatedPosts.findIndex(p => p.id === postId);
+
+        const post: Post = {
+          id: postId,
+          title: title,
+          content: content,
+          imagePath : ""
+        };
+
         updatedPosts[oldPostIndex] = post;
         this.posts = updatedPosts;
         this.postsUpdated.next([...this.posts]);
