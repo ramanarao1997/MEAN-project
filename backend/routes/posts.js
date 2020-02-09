@@ -69,11 +69,28 @@ router.put("/:id",  multer({storage: storage}).single("image"), (req,res,next) =
 }); // Update a post
 
 router.get("", (req, res, next) => {
-  Post.find()
-    .then(documents => {
+
+  const pageSize  = +req.query.pagesize; // + to convert string to integer
+  const currentPage = +req.query.page;  // pagesize and page must be used with the same names in posts service while sending a get request
+
+  const postQuery = Post.find();
+  let fetchedPosts;
+
+  if(pageSize && currentPage){
+    postQuery
+      .skip(pageSize * (currentPage - 1) )
+      .limit(pageSize)
+  }
+
+  postQuery.then(documents => {
+      fetchedPosts = documents;
+      return Post.count();
+    })
+    .then(count => {
       res.status(200).json({
         message:'posts retrieved successfully',
-        posts: documents
+        posts: fetchedPosts,
+        maxPosts: count
       });
     });
 });// Get posts from database
