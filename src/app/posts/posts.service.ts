@@ -20,10 +20,10 @@ export class PostsService {
         'http://localhost:3000/api/posts' + queryParams
       )
       .pipe(
+        // map needed by pipe operator
         map(postData => {
-          // map needed by pipe operator
+          // nomral JS map
           return {posts: postData.posts.map(post => {
-            // JS map
             return {
               id: post._id,
               title: post.title,
@@ -60,10 +60,7 @@ export class PostsService {
     postData.append('image', image, title);
 
     this.http
-      .post<{ message: string; post: Post }>(
-        'http://localhost:3000/api/posts',
-        postData
-      )
+      .post<{ message: string; post: Post }>('http://localhost:3000/api/posts', postData)
       .subscribe(responseData => {
         this.router.navigate(['/']);
       });
@@ -80,7 +77,7 @@ export class PostsService {
       postData.append('content', content);
       postData.append('image', image, title);
     } else{
-      postData = { id: postId, title:title, content:content, imagePath : image };
+      postData = { id: postId, title: title, content:content, imagePath : image };
     }
 
     this.http

@@ -6,6 +6,8 @@ const path = require("path");
 const mongoose = require('mongoose')
 
 const postsRoutes = require('./routes/posts');
+const userRoutes = require('./routes/users');
+
 const app = express();
 
 mongoose.connect('mongodb+srv://Ramana:QB6ufwNpV7RVOoLv@mean-project-cied5.mongodb.net/node-angular?retryWrites=true&w=majority')
@@ -20,8 +22,8 @@ mongoose.connect('mongodb+srv://Ramana:QB6ufwNpV7RVOoLv@mean-project-cied5.mongo
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:false}));
 
-// To allow access to images
-app.use("/images",express.static(path.join("backend/images")));
+// To allow access to images folder
+app.use("/images", express.static(path.join("backend/images")));
 
 // To avoid CORS problem
 app.use( (req, res, next) =>{
@@ -37,5 +39,6 @@ app.use( (req, res, next) =>{
 });
 
 app.use("/api/posts", postsRoutes);
+app.use("/api/users", userRoutes);
 
 module.exports = app;

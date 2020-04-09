@@ -13,13 +13,14 @@ import { mimeType } from './mime-type.validator';
 })
 
 export class PostCreateComponent implements OnInit {
+  post: Post;
+  private postId: string;
   enteredTitle = '';
   enteredContent = '';
-  post: Post;
+  imagePreview: string;
+
   isLoading = false;
   form: FormGroup;
-  imagePreview: string;
-  private postId: string;
 
   private mode = 'create';
 

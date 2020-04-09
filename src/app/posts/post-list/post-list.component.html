@@ -9,7 +9,9 @@
     <div class="post-image">
       <img [src]="post.imagePath" [alt]="post.title">
     </div>
-    <p> {{ post.content }} </p>
+    <p>
+      {{ post.content }}
+    </p>
 
     <mat-action-row>
       <a mat-button color='accent' [routerLink]="['/edit', post.id]"> EDIT </a>
