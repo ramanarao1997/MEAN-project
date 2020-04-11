@@ -1,0 +1,15 @@
+const jwt = require("jsonwebtoken");
+
+module.exports = (req, res, next) => {
+
+  // Token is sent in request header as (Authorization:"Bearer token")
+  try {
+    const token = req.headers.authorization.split(" ")[1];
+    jwt.verify(token, "This_is_my_(secret/private_key)_should_be_longer.");
+    next();
+  } catch (error) {
+    res.status(401).json({
+      message: "Auth failed!"
+    });
+  }
+};

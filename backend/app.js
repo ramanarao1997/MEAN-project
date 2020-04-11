@@ -6,7 +6,7 @@ const path = require("path");
 const mongoose = require('mongoose')
 
 const postsRoutes = require('./routes/posts');
-const userRoutes = require('./routes/users');
+const usersRoutes = require('./routes/users');
 
 const app = express();
 
@@ -29,8 +29,8 @@ app.use("/images", express.static(path.join("backend/images")));
 app.use( (req, res, next) =>{
   res.setHeader('Access-Control-Allow-Origin', '*'); // allow all domains
 
-  // allow domains with only certain headers in their requests besides the default headers
-  res.setHeader('Access-Control-Allow-Headers', 'Origin, Accept, Content-Type, X-Requested-With');
+  // allow only certain headers in the requests besides the default headers
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, Accept, Content-Type, X-Requested-With, Authorization');
 
   // allow only specific HTTP methods
    res.setHeader('Access-Control-Allow-Methods','GET, POST, OPTIONS, DELETE, PATCH, PUT');
@@ -39,6 +39,6 @@ app.use( (req, res, next) =>{
 });
 
 app.use("/api/posts", postsRoutes);
-app.use("/api/users", userRoutes);
+app.use("/api/users", usersRoutes);
 
 module.exports = app;

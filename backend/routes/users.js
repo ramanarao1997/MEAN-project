@@ -56,11 +56,6 @@ router.post("/login", (req, res, next) => {
         });
       }
 
-      // const user = new User({
-      //   email: req.body.email,
-      //   password: req.body.password
-      // });
-
       // Generate a jsonwebtoken (jwt) for authentication
       const token = jwt.sign({
           email: fetchedUser.email,
@@ -71,7 +66,6 @@ router.post("/login", (req, res, next) => {
         });
 
       res.status(200).json({
-        mesage: "User found!",
         token: token
       });
     })

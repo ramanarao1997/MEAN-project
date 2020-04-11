@@ -3,30 +3,36 @@ const multer = require("multer");
 const router = express.Router();
 
 const Post = require('../models/post');
+const checkAuth = require('../middleware/check-auth');
 
 const MIME_TYPE_MAP = {
-  'image/png':'png',
-  'image/jpg':'jpg',
-  'image/jpeg':'jpg'
+  'image/png': 'png',
+  'image/jpg': 'jpg',
+  'image/jpeg': 'jpg'
 };
 
 const storage = multer.diskStorage({
-  destination:(req, file, callback) => {
+  destination: (req, file, callback) => {
     const isValid = MIME_TYPE_MAP[file.mimetype];
     let error = new Error('Invalid mime type');
-    if(isValid){
+
+    if (isValid) {
       error = null;
     }
+
     callback(error, "backend/images");
   },
   filename: (req, file, callback) => {
     const name = file.originalname.toLowerCase().split(" ").join("-");
     const ext = MIME_TYPE_MAP[file.mimetype];
+
     callback(null, name + '-' + Date.now() + "." + ext);
   }
 })
 
-router.post("", multer({storage: storage}).single("image"), (req, res, next) => {
+
+// add checkAuth middleware to protect the route
+router.post("", checkAuth, multer({storage: storage}).single("image"), (req, res, next) => {
   const url = req.protocol + "://" + req.get("host");
 
   const post = new Post({
@@ -38,7 +44,7 @@ router.post("", multer({storage: storage}).single("image"), (req, res, next) => 
   // use post.save() on the newly created Post object
   post.save().then(createdPost => {
     res.status(201).json({
-      message : 'post stored succesfully',
+      message: 'post stored succesfully',
       post: {
         ...createdPost,
         id: createdPost._id
@@ -47,17 +53,18 @@ router.post("", multer({storage: storage}).single("image"), (req, res, next) => 
   });
 }); // To save a new post in database
 
+
 router.get("", (req, res, next) => {
   // pagesize and page must be used with the same names in posts service while sending a get request
   // as they are query parameters
-  const pageSize  = +req.query.pagesize; // + to convert string to integer
+  const pageSize = +req.query.pagesize; // + to convert string to integer
   const currentPage = +req.query.page;
   const postQuery = Post.find();
   let fetchedPosts;
 
-  if(pageSize && currentPage){
+  if (pageSize && currentPage) {
     postQuery
-      .skip(pageSize * (currentPage - 1) )
+      .skip(pageSize * (currentPage - 1))
       .limit(pageSize)
   }
 
@@ -67,29 +74,33 @@ router.get("", (req, res, next) => {
     })
     .then(count => {
       res.status(200).json({
-        message:'posts retrieved successfully',
+        message: 'posts retrieved successfully',
         posts: fetchedPosts,
         maxPosts: count
       });
     });
-});// Get posts from database
+}); // Get posts from database
+
 
 router.get("/:id", (req, res, next) => {
   Post.findById(req.params.id).then(post => {
-    if(post){
+    if (post) {
       res.status(200).json(post);
-    }
-    else{
-      res.status(404).json({message: 'Post not found!'});
+    } else {
+      res.status(404).json({
+        message: 'Post not found!'
+      });
     }
   })
 }); // Get single post (to edit)
 
-router.put("/:id",  multer({storage: storage}).single("image"), (req,res,next) =>{
+
+// add checkAuth middleware to protect the route
+router.put("/:id", checkAuth, multer({ storage: storage}).single("image"), (req, res, next) => {
 
   let imagePath = req.body.imagePath;
 
-  if(req.file){
+  if (req.file) {
     const url = req.protocol + "://" + req.get("host");
     imagePath = url + "/images/" + req.file.filename
   }
@@ -101,17 +112,27 @@ router.put("/:id",  multer({storage: storage}).single("image"), (req,res,next) =
     imagePath: imagePath
   });
 
-  Post.updateOne({_id: req.params.id}, post)
+  Post.updateOne({
+      _id: req.params.id
+    }, post)
     .then(result => {
-      res.status(200).json({message:"updated post successfully!"});
+      res.status(200).json({
+        message: "updated post successfully!"
+      });
     });
 }); // Update a post
 
-router.delete("/:id", (req, res, next) => {
-    Post.deleteOne( {_id:req.params.id} )
-      .then(result =>{
-        res.status(200).json({message: 'Post deleted!'});
-      })
+
+// add checkAuth middleware to protect the route
+router.delete("/:id", checkAuth, (req, res, next) => {
+  Post.deleteOne({
+      _id: req.params.id
+    })
+    .then(result => {
+      res.status(200).json({
+        message: 'Post deleted!'
+      });
+    })
 }); //Delete a post from database
 
 module.exports = router;
