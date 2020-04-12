@@ -13,19 +13,20 @@ import { mimeType } from './mime-type.validator';
 })
 
 export class PostCreateComponent implements OnInit {
+  post: Post;
+  private postId: string;
   enteredTitle = '';
   enteredContent = '';
-  post: Post;
+  imagePreview: string;
+
   isLoading = false;
   form: FormGroup;
-  imagePreview: string;
-  private postId: string;
 
   private mode = 'create';
 
   constructor(
     public postsService: PostsService,
-    public route: ActivatedRoute
+    public route: ActivatedRoute,
   ) {}
 
   ngOnInit() {
@@ -54,12 +55,13 @@ export class PostCreateComponent implements OnInit {
             id: postData._id,
             title: postData.title,
             content: postData.content,
-            imagePath: postData.imagePath
+            imagePath: postData.imagePath,
+            userId : this.post.userId
           };
           this.form.setValue({
             title: this.post.title,
             content: this.post.content,
-            image: this.post.imagePath
+            image: this.post.imagePath,
           });
         });
       } else {

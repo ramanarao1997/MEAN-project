@@ -20,15 +20,16 @@ export class PostsService {
         'http://localhost:3000/api/posts' + queryParams
       )
       .pipe(
+        // map needed by pipe operator
         map(postData => {
-          // map needed by pipe operator
+          // nomral JS map
           return {posts: postData.posts.map(post => {
-            // JS map
             return {
               id: post._id,
               title: post.title,
               content: post.content,
-              imagePath: post.imagePath
+              imagePath: post.imagePath,
+              userId: post.userId
             };
           }), maxPosts: postData.maxPosts};
         })
@@ -47,7 +48,7 @@ export class PostsService {
   }
 
   getPost(id: string) {
-    return this.http.get<{ _id: string; title: string; content: string, imagePath: string}>(
+    return this.http.get<{ _id: string; title: string; content: string, imagePath: string, userId : string}>(
       'http://localhost:3000/api/posts/' + id
     );
   }
@@ -60,10 +61,7 @@ export class PostsService {
     postData.append('image', image, title);
 
     this.http
-      .post<{ message: string; post: Post }>(
-        'http://localhost:3000/api/posts',
-        postData
-      )
+      .post<{ message: string; post: Post }>('http://localhost:3000/api/posts', postData)
       .subscribe(responseData => {
         this.router.navigate(['/']);
       });
@@ -79,8 +77,8 @@ export class PostsService {
       postData.append('title', title);
       postData.append('content', content);
       postData.append('image', image, title);
-    } else{
-      postData = { id: postId, title:title, content:content, imagePath : image };
+    } else {
+      postData = { id: postId, title: title, content:content, imagePath : image, userId : null };
     }
 
     this.http
