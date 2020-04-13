@@ -24,7 +24,7 @@ router.post("/signup", (req, res, next) => {
         })
         .catch(err => {
           res.status(500).json({
-            error: err
+              message: "Username already taken! Please try another."
           });
         });
     });
@@ -41,7 +41,7 @@ router.post("/login", (req, res, next) => {
     .then(user => {
       if (!user) {
         return res.status(401).json({
-          message: "Authentication failed! No such user exists."
+          message: "No such user exists."
         });
       }
 
@@ -52,7 +52,7 @@ router.post("/login", (req, res, next) => {
     .then(comparisonResult => {
       if (!comparisonResult) {
         return res.status(401).json({
-          message: "Authentication failed!"
+          message: "Invalid Password. Please try again."
         });
       }
 
@@ -74,7 +74,7 @@ router.post("/login", (req, res, next) => {
     .catch(err => {
       console.log(err)
       return res.status(401).json({
-        message: "Authentication failed!"
+        message: "Authentication failed! Please try again."
       });
     });
 });

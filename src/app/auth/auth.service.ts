@@ -36,9 +36,14 @@ export class AuthService {
 
     this.http
       .post("http://localhost:3000/api/users/signup", authData)
-      .subscribe((response) => {
-        console.log(response);
-      });
+      .subscribe(
+        (response) => {
+          this.router.navigate(["/"]);
+        },
+        (error) => {
+          this.authStatusListener.next(false);
+        }
+      );
   }
 
   loginUser(email: string, password: string) {
@@ -48,28 +53,33 @@ export class AuthService {
         "http://localhost:3000/api/users/login",
         authData
       )
-      .subscribe((response) => {
-        const token = response.token;
-        this.token = token;
+      .subscribe(
+        (response) => {
+          const token = response.token;
+          this.token = token;
 
-        if (token) {
-          const expiresInDuration = response.expiresIn;
-          this.setAuthTimer(expiresInDuration);
+          if (token) {
+            const expiresInDuration = response.expiresIn;
+            this.setAuthTimer(expiresInDuration);
 
-          this.isAuthenticated = true;
-          this.authStatusListener.next(true);
-          this.userId = response.userId;
+            this.isAuthenticated = true;
+            this.authStatusListener.next(true);
+            this.userId = response.userId;
 
-          const now = new Date();
-          const expirationDate = new Date(
-            now.getTime() + expiresInDuration * 1000
-          );
+            const now = new Date();
+            const expirationDate = new Date(
+              now.getTime() + expiresInDuration * 1000
+            );
 
-          this.saveAuthData(token, expirationDate, this.userId);
+            this.saveAuthData(token, expirationDate, this.userId);
 
-          this.router.navigate(["/"]);
+            this.router.navigate(["/"]);
+          }
+        },
+        (error) => {
+          this.authStatusListener.next(false);
         }
-      });
+      );
   }
 
   // To handle page reloads
@@ -130,6 +140,10 @@ export class AuthService {
       return;
     }
 
-    return { token: token, expirationDate: new Date(expirationDate), userId : userId };
+    return {
+      token: token,
+      expirationDate: new Date(expirationDate),
+      userId: userId,
+    };
   }
 }

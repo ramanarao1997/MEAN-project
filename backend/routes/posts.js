@@ -46,14 +46,19 @@ router.post("", checkAuth, multer({
 
   // use post.save() on the newly created Post object
   post.save().then(createdPost => {
-    res.status(201).json({
-      message: 'post stored succesfully',
-      post: {
-        ...createdPost,
-        id: createdPost._id
-      }
+      res.status(201).json({
+        message: 'post stored succesfully',
+        post: {
+          ...createdPost,
+          id: createdPost._id
+        }
+      });
+    })
+    .catch(error => {
+      res.status(500).json({
+        message: "Could not create post. Please try again!"
+      });
     });
-  });
 }); // To save a new post in database
 
 
@@ -81,6 +86,10 @@ router.get("", (req, res, next) => {
         posts: fetchedPosts,
         maxPosts: count
       });
+    }).catch(error => {
+      res.status(500).json({
+        message: "Could not load posts properly!"
+      });
     });
 }); // Get posts from database
 
@@ -94,7 +103,11 @@ router.get("/:id", (req, res, next) => {
         message: 'Post not found!'
       });
     }
-  })
+  }).catch(error => {
+    res.status(500).json({
+      message: "Could not load post properly!"
+    });
+  });
 }); // Get single post (to edit)
 
 
@@ -129,10 +142,12 @@ router.put("/:id", checkAuth, multer({
         });
       } else {
         res.status(401).json({
-          message: "Not authorized to edit this post!"
+          message: "You are not authorized to edit this post!"
         });
       }
-    });
+    }).catch(error => {
+      res.status(500).json({message: "Failed to edit the post! Please try again."});
+    })
 }); // Update a post
 
 
@@ -149,9 +164,13 @@ router.delete("/:id", checkAuth, (req, res, next) => {
         });
       } else {
         res.status(401).json({
-          message: "Not authorized to delete this post!"
+          message: "You are not authorized to delete this post!"
         });
       }
+    }).catch(error => {
+      res.status(500).json({
+        message: "Failed to delete the post! Please try again."
+      });
     })
 }); //Delete a post from database
 
