@@ -1,5 +1,6 @@
 # MEANProject
 
+An application that allows users to share their posts. Only authorized users will be able to edit/delete the posts.
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.3.21.
 
 ## Development server
